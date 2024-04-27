@@ -1,4 +1,5 @@
 #pragma once
+#include "DX12Command.h"
 
 class Window;
 struct ID3D12Device;
@@ -12,12 +13,14 @@ public:
 	DX12(const DX12&) = delete;
 
 	bool Init(Window* aWindow);
-	void BeginFrame();
+
+	DX12Command		command;
+	ID3D12Device*	device{ nullptr };
+	IDXGIFactory7*	factory{ nullptr };
+
+	bool BeginFrame();
 	void EndFrame();
-
-	ID3D12Device* device;
-	IDXGIFactory7* factory;
-
+	void Render();
 
 	//IDXGISwapChain1* swapChain;
 	//ID3D12CommandQueue* commandQueue;

@@ -18,15 +18,13 @@ LRESULT GameApplication::WindowProcedure(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WP
 GameApplication::GameApplication() : Application()
 {
 	//myGame = nullptr;
-	//myEngine = Engine::CreateInstance(&myTimer);
 	engine->CreateInstance();
 }
 
 GameApplication::~GameApplication()
 {
 	InputManager::GetInstance()->DestroyInstance();
-
-	//myEngine->DestroyInstance();
+	engine->DestroyInstance();
 
 	//delete myGame;
 	//myGame = nullptr;
@@ -34,15 +32,14 @@ GameApplication::~GameApplication()
 
 bool GameApplication::BeginFrame()
 {
-	//return myEngine->BeginFrame();
-	return true;
+	return engine->BeginFrame();
 }
 
 void GameApplication::Init(HINSTANCE hInstance, WNDPROC wndProc)
 {
 	hInstance; wndProc;
 
-	DirectX::XMINT2 resolution = { 1920, 1080 };
+	DirectX::XMINT2 resolution = { 1600, 900 };
 	std::wstring icon = L"";
 
 	{
@@ -58,6 +55,8 @@ void GameApplication::Init(HINSTANCE hInstance, WNDPROC wndProc)
 		resolution.y = primaryMonitorRect.bottom - primaryMonitorRect.top;
 	}
 
+	resolution = { 1600, 900 };
+
 	engine->Init(resolution.x, resolution.y, L"WindowClass", L"DirectX 12 App", icon.c_str(), hInstance, wndProc);
 }
 
@@ -65,10 +64,10 @@ void GameApplication::Update(const TimerData& aTimerData)
 {
 	::Application::Update(aTimerData);
 
-	if (GetKeyState(VK_ESCAPE))
-	{
-		PostQuitMessage(0);
-	}
+	//if (GetKeyState(VK_ESCAPE))
+	//{
+	//	PostQuitMessage(0);
+	//}
 
 	InputManager::GetInstance()->Update();
 }

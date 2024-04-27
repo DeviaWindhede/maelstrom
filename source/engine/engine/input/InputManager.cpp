@@ -28,7 +28,6 @@ InputManager::~InputManager()
 	myMouse->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
 	ShowCursor(true);
 	myMouseIsVisible = true;
-	myMouse->SetWindow(nullptr);
 	myMouse.reset();
 	myMouse = nullptr;
 	myInstance = nullptr;

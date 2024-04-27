@@ -11,6 +11,19 @@
 
 using namespace Microsoft::WRL;
 
+namespace d3d12_common
+{
+	template<typename T>
+	constexpr void Release(T*& aPtr)
+	{
+		if (aPtr)
+		{
+			aPtr->Release();
+			aPtr = nullptr;
+		}
+	}
+}
+
 #ifdef _DEBUG
 
 #ifndef DXCall
@@ -36,4 +49,22 @@ using namespace Microsoft::WRL;
 #define DXCall(x) x
 #endif
 
+#endif
+
+#ifdef _DEBUG
+#define NAME_D3D12_OBJECT(aPtr, aName) aPtr->SetName(aName); OutputDebugString(L"|| Created D3D12 object: "); OutputDebugString(aName); OutputDebugString(L"\n");
+
+#define NAME_D3D12_OBJECT_INDEXED(aPtr, aIndex, aName)				\
+{																	\
+	wchar_t name[128];												\
+	if (swprintf_s(name, L"%s[%u]", aName, aIndex)) {				\
+		aPtr->SetName(name);										\
+		OutputDebugString(L"|| Created D3D12 object: ");			\
+		OutputDebugString(name);									\
+		OutputDebugString(L"\n");									\
+	}																\
+}
+#else
+#define NAME_D3D12_OBJECT(aPtr, aName)
+#define NAME_D3D12_OBJECT_INDEXED(aPtr, aName, aIndex)
 #endif

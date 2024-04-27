@@ -48,7 +48,7 @@ bool Engine::Init(
 )
 {
 	myWindow->Init(aWindowWidth, aWindowHeight, aClassName, aWindowName, aIconPath, hInstance, WndProc);
-
+	
 	DX().Init(myWindow);
 
 	InputManager::GetInstance()->Init();
@@ -71,11 +71,13 @@ bool Engine::BeginFrame()
 		}
 	}
 
-	return true;
+	return DX().BeginFrame();
 }
 
 
 void Engine::EndFrame()
 {
+	//DX().Render();
+	DX().EndFrame();
 	//DX().swapChain->Present(1, 0);
 }

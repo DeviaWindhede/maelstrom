@@ -39,6 +39,5 @@ private:
 	DX12 myDX12;
 	Window* myWindow;
 	bool myShouldExit = false;
-
 	static Engine* myInstance;
 };

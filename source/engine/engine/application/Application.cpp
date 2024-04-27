@@ -8,8 +8,31 @@ LRESULT Application::WindowProcedure(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM
 	switch (uMsg)
 	{
 	case WM_SIZE:
+	{
+		int i = 0;
+		i++;
 		//HANDE RESIZE
 		break;
+	}
+	case WM_KILLFOCUS:
+	{
+		break;
+	}
+	case WM_SHOWWINDOW:
+	{
+		// SW_OTHERUNZOOM	| The window is being uncovered because a maximize window was restored or minimized.
+		// SW_OTHERZOOM		| The window is being covered by another window that has been maximized.
+		// SW_PARENTCLOSING | The window's owner window is being minimized.
+		// SW_PARENTOPENING | The window's owner window is being restored.
+		break;
+	}
+	case WM_SETFOCUS:
+	{
+		int i = 0;
+		i++;
+		//HANDLE SET FOCUS
+		break;
+	}
 	case WM_DESTROY:
 	case WM_CLOSE:
 	case WM_QUIT:

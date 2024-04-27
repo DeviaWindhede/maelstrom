@@ -18,5 +18,11 @@ public:
 	virtual bool BeginFrame() = 0;
 	virtual void EndFrame();
 protected:
+	void(*onResize)(void) = nullptr;
+	void(*onKillFocus)(void) = nullptr;
+	void(*onShowWindow)(void) = nullptr;
+	void(*onSetFocus)(void) = nullptr;
+	void(*onQuit)(void) = nullptr;
+
 	ApplicationTimer myTimer;
 };
