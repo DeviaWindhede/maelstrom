@@ -7,15 +7,6 @@
 
 constexpr D3D_FEATURE_LEVEL MIN_FEATURE_LEVEL{ D3D_FEATURE_LEVEL_11_0 };
 
-template<typename T>
-constexpr void Release(T*& aPtr)
-{
-	if (aPtr)
-	{
-		aPtr->Release();
-		aPtr = nullptr;
-	}
-}
 
 DX12::DX12()
 {
@@ -23,6 +14,7 @@ DX12::DX12()
 
 DX12::~DX12()
 {
+	Shutdown();
 }
 
 bool DX12::Init(Window* aWindow)
@@ -61,7 +53,7 @@ bool DX12::Init(Window* aWindow)
 	{
 		IDXGIAdapter4* pAdapterTemp{ nullptr };
 
-		// this could run forever:( surely the user doesn't have more than 8 monitors
+		// this could run forever:( surely the user doesn't have more than 8 gpus
 
 		uint32_t j = 0;
 		for (
@@ -75,7 +67,7 @@ bool DX12::Init(Window* aWindow)
 				break;
 			}
 
-			Release(pAdapterTemp);
+			::d3d12_common::Release(pAdapterTemp);
 
 			if (j++ > 8)
 			{
@@ -119,8 +111,18 @@ bool DX12::Init(Window* aWindow)
 		{
 			return false;
 		}
+		NAME_D3D12_OBJECT(
+			device,
+			L"Main Device"
+		);
 
 		device->SetName(L"MAIN DEVICE");
+	}
+
+	new (&command) DX12Command(device, D3D12_COMMAND_LIST_TYPE_DIRECT);
+	if (!command.GetCommandQueue())
+	{
+		return false;
 	}
 
 
@@ -156,46 +158,32 @@ bool DX12::Init(Window* aWindow)
 	}
 #endif
 
-	//const WindowData& windowData = aWindow->GetWindowData();
-
-	//// Create device
-	//DXCall(D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_12_2, IID_PPV_ARGS(&device))); // D3D_FEATURE_LEVEL_12_2 
-	//
-	//// Create swap chain
-	//DXGI_SWAP_CHAIN_DESC1 scd = {};
-	//scd.BufferCount = 2;
-	//scd.Width = windowData.viewPortWidth;
-	//scd.Height = windowData.viewPortHeight;
-	//scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	//scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	//scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-	//scd.SampleDesc.Count = 1;
-	//DXCall(pFactory->CreateSwapChainForHwnd(device, aWindow->GetHWND(), &scd, nullptr, nullptr, &swapChain));
-
-	//// Create command queue
-	//D3D12_COMMAND_QUEUE_DESC cqDesc = {};
-	//cqDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-	//cqDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-	//DXCall(device->CreateCommandQueue(&cqDesc, IID_PPV_ARGS(&commandQueue)));
-
-	//// Create command allocator
-	//DXCall(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator)));
-
-	//// Create command list
-	//DXCall(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList)));
-
-	//// Create synchronization objects
-	//UINT64 fenceValue = 0;
-	//DXCall(device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)));
-
 	return true;
+}
+
+void DX12::Render()
+{
+	BeginFrame();
+	{
+		ID3D12GraphicsCommandList6* commandList{ command.GetCommandList() };
+		commandList;
+	}
+	EndFrame();
+}
+
+bool DX12::BeginFrame()
+{
+	return command.BeginFrame();
+}
+
+void DX12::EndFrame()
+{
+	command.EndFrame();
 }
 
 void DX12::Shutdown()
 {
-	Release(factory);
-	Release(device);
-
+	command.Release();
 #ifdef _DEBUG
 	{
 		{
@@ -209,10 +197,13 @@ void DX12::Shutdown()
 
 		ComPtr<ID3D12DebugDevice2> debugDevice;
 		DXCall(device->QueryInterface(IID_PPV_ARGS(&debugDevice)));
-		Release(device);
+		::d3d12_common::Release(device);
 		DXCall(debugDevice->ReportLiveDeviceObjects(
 			D3D12_RLDO_SUMMARY | D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL
 		));
 	}
 #endif
+
+	::d3d12_common::Release(factory);
+	::d3d12_common::Release(device);
 }
